@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asocial - Accedi</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-logo">asocial</h1>
+            <p class="auth-tagline">il blog di gruppo</p>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form">
+                <h2>Accedi</h2>
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="auth-btn">Accedi</button>
+                <p class="auth-toggle">
+                    Non hai un account?
+                    <a href="#" id="showSignup">Registrati</a>
+                </p>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form hidden">
+                <h2>Registrati</h2>
+                <div class="form-group">
+                    <input type="text" id="signupName" placeholder="Nome visualizzato" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" placeholder="Password (min 6 caratteri)" required>
+                </div>
+                <button type="submit" class="auth-btn">Registrati</button>
+                <p class="auth-toggle">
+                    Hai già un account?
+                    <a href="#" id="showLogin">Accedi</a>
+                </p>
+            </form>
+
+            <div id="authError" class="auth-error hidden"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { signIn, signUp, checkAuth } from './js/auth.js';
+
+        // Check if already logged in
+        checkAuth((user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const authError = document.getElementById('authError');
+
+        // Toggle between login and signup
+        document.getElementById('showSignup').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            authError.classList.add('hidden');
+        });
+
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            authError.classList.add('hidden');
+        });
+
+        // Handle login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const result = await signIn(email, password);
+
+            if (result.success) {
+                window.location.href = 'index.html';
+            } else {
+                showError(result.error);
+            }
+        });
+
+        // Handle signup
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            const result = await signUp(email, password, name);
+
+            if (result.success) {
+                window.location.href = 'index.html';
+            } else {
+                showError(result.error);
+            }
+        });
+
+        function showError(message) {
+            authError.textContent = message;
+            authError.classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

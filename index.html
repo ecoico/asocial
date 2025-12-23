@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>asocial - being ordinary is the value</title>
+    <meta name="description" content="A social app for the mundane, ordinary, and unremarkable moments of life.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">asocial</a>
+                <nav class="nav">
+                    <a href="#" class="nav-link active" data-page="feed">feed</a>
+                    <a href="#" class="nav-link" data-page="profile">profile</a>
+                    <span id="user-name" class="user-name"></span>
+                    <button class="btn btn-ghost" id="logout-btn">esci</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Feed Page -->
+        <div id="feed-page" class="page">
+            <div class="container">
+
+                <!-- Create Post Section -->
+                <div class="card create-post">
+                    <form id="create-post-form">
+                        <textarea id="post-text" placeholder="Scrivi un messaggio al gruppo..."
+                            maxlength="500"></textarea>
+                        <div class="form-actions">
+                            <div class="char-counter" id="char-counter">0/500</div>
+                            <button type="submit" class="btn btn-primary" id="post-btn">invia</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Feed Container -->
+                <div id="feed-container"></div>
+
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile-page" class="page hidden">
+            <div class="container">
+                <div id="profile-header" class="profile-header"></div>
+                <div id="profile-posts" class="profile-posts"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
