@@ -130,15 +130,15 @@ class AsocialApp {
         return `
       <div class="card post-card" style="--index: ${index}">
         <div class="post-header">
-          <div class="post-avatar">👤</div>
+          <!-- Avatar removed for cleaner look -->
           <div class="post-info">
             <span class="post-username">${this.escapeHtml(post.authorName || 'Anonimo')}</span>
-            <div class="post-timestamp">${this.formatTimestamp(post.timestamp)}${post.edited ? ' (modificato)' : ''}</div>
+            <div class="post-timestamp">${this.formatTimestamp(post.timestamp)}${post.edited ? ' (mod)' : ''}</div>
           </div>
           ${isOwnPost ? `
             <div class="post-menu">
-              <button class="post-menu-btn edit-btn" data-post-id="${post.id}" title="Modifica">✏️</button>
-              <button class="post-menu-btn delete-btn" data-post-id="${post.id}" title="Elimina">🗑️</button>
+              <button class="post-menu-btn edit-btn" data-post-id="${post.id}">modifica</button>
+              <button class="post-menu-btn delete-btn" data-post-id="${post.id}">elimina</button>
             </div>
           ` : ''}
         </div>
@@ -147,12 +147,10 @@ class AsocialApp {
         
         <div class="post-actions">
           <button class="post-action bookmark-btn ${isBookmarked ? 'active' : ''}" data-post-id="${post.id}">
-            <span>${isBookmarked ? '★' : '☆'}</span>
-            <span>bookmark</span>
+            <span>${isBookmarked ? 'salvato' : 'salva'}</span>
           </button>
           <button class="post-action comment-btn" data-post-id="${post.id}">
-            <span>💬</span>
-            <span>${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}</span>
+            <span>${commentCount} ${commentCount === 1 ? 'commento' : 'commenti'}</span>
           </button>
         </div>
         
@@ -201,8 +199,8 @@ class AsocialApp {
                 const isBookmarked = Storage.toggleBookmark(postId);
 
                 btn.classList.toggle('active', isBookmarked);
-                const star = btn.querySelector('span:first-child');
-                star.textContent = isBookmarked ? '★' : '☆';
+                const textSpan = btn.querySelector('span:first-child');
+                textSpan.textContent = isBookmarked ? 'salvato' : 'salva';
             });
         });
 
@@ -363,7 +361,7 @@ class AsocialApp {
             : 'Utente';
 
         profileHeader.innerHTML = `
-      <div class="profile-avatar">👤</div>
+      <!-- Avatar removed -->
       <h2 class="profile-username">${this.escapeHtml(displayName)}</h2>
     `;
 
