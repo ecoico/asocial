@@ -134,7 +134,7 @@ class AsocialApp {
 
         // Count specific reactions to show the most popular one or just a generic count
         // For this design, we'll show the user's reaction if it exists, otherwise "Reagisci"
-        const reactionLabel = myReaction ? myReaction : 'Reagisci';
+        const reactionLabel = myReaction ? myReaction : 'reagisci';
         const reactionActive = !!myReaction;
 
         return `
@@ -190,12 +190,12 @@ class AsocialApp {
 
     renderComments(post) {
         if (!post.comments || post.comments.length === 0) {
-            return '<div class="empty-state">no comments yet</div>';
+            return '<div class="empty-state">nessun commento ancora</div>';
         }
 
         return post.comments.map(comment => {
             return `
-        <div class="comment">
+        <div class="commenta">
           <div class="comment-author">${this.escapeHtml(comment.authorName || 'Anonimo')}</div>
           <div class="comment-text">${this.escapeHtml(comment.text)}</div>
           <div class="comment-timestamp">${this.formatTimestamp(comment.timestamp)}</div>
@@ -209,10 +209,10 @@ class AsocialApp {
       <form class="comment-form" data-post-id="${postId}">
         <textarea 
           class="comment-input" 
-          placeholder="add a comment..." 
+          placeholder="aggiungi un commento..." 
           maxlength="280"
         ></textarea>
-        <button type="submit" class="btn btn-primary">comment</button>
+        <button type="submit" class="btn btn-primary">commenta</button>
       </form>
     `;
     }
@@ -352,7 +352,7 @@ class AsocialApp {
         const post = this.posts.find(p => p.id === postId);
         if (!post) return;
 
-        const newContent = prompt('Modifica il tuo messaggio:', post.content);
+        const newContent = prompt('modifica il tuo messaggio:', post.content);
 
         if (newContent && newContent.trim() && newContent !== post.content) {
             const result = await Storage.updatePost(postId, newContent.trim());
@@ -364,7 +364,7 @@ class AsocialApp {
     }
 
     async deletePost(postId) {
-        if (confirm('Sei sicuro di voler eliminare questo messaggio?')) {
+        if (confirm('sei sicuro di voler eliminare questo messaggio?')) {
             const result = await Storage.deletePost(postId);
 
             if (!result.success) {
