@@ -110,7 +110,7 @@ class AsocialApp {
         if (!feedContainer) return;
 
         if (this.posts.length === 0) {
-            feedContainer.innerHTML = '<div class="empty-state">Nessun post ancora. Scrivi il primo!</div>';
+            feedContainer.innerHTML = '<div class="empty-state">per ora nessun post, scrivi per primo!</div>';
             return;
         }
 
@@ -190,7 +190,7 @@ class AsocialApp {
 
     renderComments(post) {
         if (!post.comments || post.comments.length === 0) {
-            return '<div class="empty-state">nessun commento ancora</div>';
+            return '<div class="empty-state">commenta il post per primo!</div>';
         }
 
         return post.comments.map(comment => {
@@ -209,7 +209,7 @@ class AsocialApp {
       <form class="comment-form" data-post-id="${postId}">
         <textarea 
           class="comment-input" 
-          placeholder="aggiungi un commento..." 
+          placeholder="aggiungi un commento, qui puoi essere spietato..." 
           maxlength="280"
         ></textarea>
         <button type="submit" class="btn btn-primary">commenta</button>
