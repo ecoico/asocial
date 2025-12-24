@@ -41,6 +41,9 @@ export async function signUp(email, password, displayName) {
         // Force reload ensuring profile is updated locally
         await userCredential.user.reload();
 
+        // BACKUP: Save to localStorage in case Firebase is slow
+        localStorage.setItem('temp_display_name', displayName);
+
         return { success: true, user: auth.currentUser };
     } catch (error) {
         console.error("Error signing up:", error);

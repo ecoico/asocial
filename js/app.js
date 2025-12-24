@@ -18,6 +18,24 @@ class AsocialApp {
         try {
             this.currentUser = await requireAuth();
 
+            // CRITICAL: Check if name is missing and try to recover it
+            if (!this.currentUser.displayName) {
+                await this.currentUser.reload();
+                this.currentUser = getCurrentUser(); // Refresh object reference
+
+                // If still missing, check local backup from registration
+                if (!this.currentUser.displayName) {
+                    const tempName = localStorage.getItem('temp_display_name');
+                    if (tempName) {
+                        // Force update profile again if found locally
+                        // Note: We can't easily import updateProfile here without refactoring, 
+                        // so we will just assume the UI uses the temp name for now.
+                        // Or better, just treat it as the display name for UI purposes.
+                        this.currentUser.displayName = tempName;
+                    }
+                }
+            }
+
             // Set up UI with user info
             this.setupUserInfo();
 
