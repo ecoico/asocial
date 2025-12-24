@@ -127,15 +127,24 @@ class AsocialApp {
         const commentCount = post.comments ? post.comments.length : 0;
         const isOwnPost = this.currentUser && post.authorId === this.currentUser.uid;
 
-        // Reactions logic
+        // Reactions logic - Track all reactions and show a summary
         const reactions = post.reactions || {};
         const myReaction = this.currentUser ? reactions[this.currentUser.uid] : null;
-        const reactionCount = Object.keys(reactions).length;
 
-        // Count specific reactions to show the most popular one or just a generic count
-        // For this design, we'll show the user's reaction if it exists, otherwise "Reagisci"
-        const reactionLabel = myReaction ? myReaction : 'reagisci';
+        // Count each type of reaction
+        const reactionSummary = {};
+        Object.values(reactions).forEach(type => {
+            reactionSummary[type] = (reactionSummary[type] || 0) + 1;
+        });
+
+        const reactionTypes = ['osservato', 'discreto', 'dignitoso', 'inaccettabile'];
+        const summaryHtml = reactionTypes
+            .filter(type => reactionSummary[type])
+            .map(type => `<span class="reaction-summary-item ${myReaction === type ? 'active' : ''}">${type} ${reactionSummary[type]}</span>`)
+            .join(' ');
+
         const reactionActive = !!myReaction;
+        const reactionLabel = myReaction ? myReaction : 'aggiungi reazione';
 
         return `
       <div class="card post-card" style="--index: ${index}">
@@ -160,10 +169,12 @@ class AsocialApp {
         
         <div class="post-actions">
            <div class="reaction-wrapper">
-              <button class="post-action reaction-btn ${reactionActive ? 'active' : ''}" data-post-id="${post.id}">
-                <span>${reactionLabel}</span>
-                <span class="reaction-count">(${reactionCount})</span>
-              </button>
+               <button class="post-action reaction-btn ${reactionActive ? 'active' : ''}" data-post-id="${post.id}">
+                 <span>${reactionLabel}</span>
+               </button>
+               <div class="reaction-summary">
+                 ${summaryHtml}
+               </div>
               <div class="reaction-menu hidden" id="reactions-${post.id}">
                   <button class="reaction-option" data-value="osservato">osservato</button>
                   <button class="reaction-option" data-value="discreto">discreto</button>
@@ -259,7 +270,12 @@ class AsocialApp {
                     newValue = null; // Toggle off
                 }
 
-                await Storage.updateReaction(postId, this.currentUser.uid, newValue);
+                const result = await Storage.updateReaction(postId, this.currentUser.uid, newValue);
+
+                if (!result.success) {
+                    alert('Errore nell\'inserimento della reazione. Potresti non avere i permessi necessari.');
+                    console.error('Reaction error:', result.error);
+                }
 
                 // Hide menu
                 menu.classList.add('hidden');
@@ -403,6 +419,12 @@ class AsocialApp {
                     authorId: this.currentUser.uid,
                     authorName: this.currentUser.displayName || this.currentUser.email.split('@')[0] || 'Anonimo'
                 };
+
+                // CRITICAL: Ensure we use the most up-to-date name if it was just changed/set
+                if (!this.currentUser.displayName && this.currentUser.reload) {
+                    await this.currentUser.reload();
+                    postData.authorName = this.currentUser.displayName || postData.authorName;
+                }
 
                 const result = await Storage.createPost(postData);
 

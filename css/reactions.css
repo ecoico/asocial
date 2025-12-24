@@ -84,3 +84,25 @@
     margin-left: 4px;
     font-weight: 600;
 }
+
+.reaction-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: 12px;
+    align-items: center;
+}
+
+.reaction-summary-item {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.reaction-summary-item.active {
+    background: #000;
+    color: #fff;
+}
