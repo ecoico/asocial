@@ -167,7 +167,7 @@ class AsocialApp {
            <div class="reaction-wrapper">
               <button class="post-action reaction-btn ${reactionActive ? 'active' : ''}" data-post-id="${post.id}">
                 <span>${reactionLabel}</span>
-                ${reactionCount > 0 ? `<span class="reaction-count">(${reactionCount})</span>` : ''}
+                <span class="reaction-count">(${reactionCount})</span>
               </button>
               <div class="reaction-menu hidden" id="reactions-${post.id}">
                   <button class="reaction-option" data-value="Osservato">Osservato</button>
@@ -485,13 +485,7 @@ class AsocialApp {
         });
     }
 
-    resetImageUpload() {
-        this.selectedFile = null;
-        if (this.fileInput) this.fileInput.value = '';
-        if (this.fileNameSpan) this.fileNameSpan.textContent = '';
-        if (this.previewContainer) this.previewContainer.classList.add('hidden');
-        if (this.previewImg) this.previewImg.src = '';
-    }
+
 
     renderProfile(userId) {
         const profileHeader = document.getElementById('profile-header');
