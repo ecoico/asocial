@@ -96,6 +96,7 @@ const Storage = {
         }
     },
 
+    /* REACTION UPDATE COMMENTED OUT
     // Update a post
     async updateReaction(postId, userId, reactionType) {
         try {
@@ -115,6 +116,7 @@ const Storage = {
             return { success: false, error: error.message };
         }
     },
+    */
 
     async updatePost(postId, newContent) {
         try {

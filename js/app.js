@@ -127,6 +127,7 @@ class AsocialApp {
         const commentCount = post.comments ? post.comments.length : 0;
         const isOwnPost = this.currentUser && post.authorId === this.currentUser.uid;
 
+        /* REACTION LOGIC COMMENTED OUT
         // Reactions logic - Track all reactions and show a summary
         const reactions = post.reactions || {};
         const myReaction = this.currentUser ? reactions[this.currentUser.uid] : null;
@@ -145,6 +146,7 @@ class AsocialApp {
 
         const reactionActive = !!myReaction;
         const reactionLabel = myReaction ? myReaction : 'aggiungi reazione';
+        */
 
         return `
       <div class="card post-card" style="--index: ${index}">
@@ -168,20 +170,7 @@ class AsocialApp {
         </div>
         
         <div class="post-actions">
-           <div class="reaction-wrapper">
-               <button class="post-action reaction-btn ${reactionActive ? 'active' : ''}" data-post-id="${post.id}">
-                 <span>${reactionLabel}</span>
-               </button>
-               <div class="reaction-summary">
-                 ${summaryHtml}
-               </div>
-              <div class="reaction-menu hidden" id="reactions-${post.id}">
-                  <button class="reaction-option" data-value="osservato">osservato</button>
-                  <button class="reaction-option" data-value="discreto">discreto</button>
-                  <button class="reaction-option" data-value="dignitoso">dignitoso</button>
-                  <button class="reaction-option" data-value="inaccettabile">inaccettabile</button>
-              </div>
-           </div>
+           <!-- REACTION UI REMOVED -->
 
           <button class="post-action bookmark-btn ${isBookmarked ? 'active' : ''}" data-post-id="${post.id}">
             <span>${isBookmarked ? 'salvato' : 'salva'}</span>
@@ -229,6 +218,7 @@ class AsocialApp {
     }
 
     attachPostListeners() {
+        /* REACTION EVENT LISTENERS COMMENTED OUT
         // Reaction buttons (open menu)
         document.querySelectorAll('.reaction-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -286,6 +276,7 @@ class AsocialApp {
         document.addEventListener('click', () => {
             document.querySelectorAll('.reaction-menu').forEach(menu => menu.classList.add('hidden'));
         });
+        */
 
         // Bookmark buttons
         document.querySelectorAll('.bookmark-btn').forEach(btn => {
