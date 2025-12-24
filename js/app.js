@@ -165,10 +165,10 @@ class AsocialApp {
                 <span class="reaction-count">(${reactionCount})</span>
               </button>
               <div class="reaction-menu hidden" id="reactions-${post.id}">
-                  <button class="reaction-option" data-value="Osservato">Osservato</button>
-                  <button class="reaction-option" data-value="Discreto">Discreto</button>
-                  <button class="reaction-option" data-value="Dignitoso">Dignitoso</button>
-                  <button class="reaction-option" data-value="Inaccettabile">Inaccettabile</button>
+                  <button class="reaction-option" data-value="osservato">osservato</button>
+                  <button class="reaction-option" data-value="discreto">discreto</button>
+                  <button class="reaction-option" data-value="dignitoso">dignitoso</button>
+                  <button class="reaction-option" data-value="inaccettabile">inaccettabile</button>
               </div>
            </div>
 
