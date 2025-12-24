@@ -1,6 +1,7 @@
 // Main Application Logic for Asocial with Firebase
 import { requireAuth, logout, getCurrentUser } from './auth.js';
 import Storage from './storage.js';
+import { uploadImage } from './image-upload.js';
 
 class AsocialApp {
     constructor() {
@@ -29,6 +30,9 @@ class AsocialApp {
 
             // Set up create post form
             this.setupCreatePost();
+
+            // Set up camera
+            this.setupCamera();
 
             // Subscribe to real-time posts
             this.subscribeToPostsUpdates();
@@ -127,6 +131,16 @@ class AsocialApp {
         const commentCount = post.comments ? post.comments.length : 0;
         const isOwnPost = this.currentUser && post.authorId === this.currentUser.uid;
 
+        // Reactions logic
+        const reactions = post.reactions || {};
+        const myReaction = this.currentUser ? reactions[this.currentUser.uid] : null;
+        const reactionCount = Object.keys(reactions).length;
+
+        // Count specific reactions to show the most popular one or just a generic count
+        // For this design, we'll show the user's reaction if it exists, otherwise "Reagisci"
+        const reactionLabel = myReaction ? myReaction : 'Reagisci';
+        const reactionActive = !!myReaction;
+
         return `
       <div class="card post-card" style="--index: ${index}">
         <div class="post-header">
@@ -143,9 +157,25 @@ class AsocialApp {
           ` : ''}
         </div>
         
-        <div class="post-content" id="content-${post.id}">${this.escapeHtml(post.content)}</div>
+        <div class="post-content" id="content-${post.id}">
+            ${this.escapeHtml(post.content)}
+            ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image" loading="lazy">` : ''}
+        </div>
         
         <div class="post-actions">
+           <div class="reaction-wrapper">
+              <button class="post-action reaction-btn ${reactionActive ? 'active' : ''}" data-post-id="${post.id}">
+                <span>${reactionLabel}</span>
+                ${reactionCount > 0 ? `<span class="reaction-count">(${reactionCount})</span>` : ''}
+              </button>
+              <div class="reaction-menu hidden" id="reactions-${post.id}">
+                  <button class="reaction-option" data-value="Osservato">Osservato</button>
+                  <button class="reaction-option" data-value="Discreto">Discreto</button>
+                  <button class="reaction-option" data-value="Dignitoso">Dignitoso</button>
+                  <button class="reaction-option" data-value="Inaccettabile">Inaccettabile</button>
+              </div>
+           </div>
+
           <button class="post-action bookmark-btn ${isBookmarked ? 'active' : ''}" data-post-id="${post.id}">
             <span>${isBookmarked ? 'salvato' : 'salva'}</span>
           </button>
@@ -192,6 +222,59 @@ class AsocialApp {
     }
 
     attachPostListeners() {
+        // Reaction buttons (open menu)
+        document.querySelectorAll('.reaction-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent closing immediately
+                const postId = btn.dataset.postId;
+
+                // Close all other open reaction menus first
+                document.querySelectorAll('.reaction-menu').forEach(menu => {
+                    if (menu.id !== `reactions-${postId}`) {
+                        menu.classList.add('hidden');
+                    }
+                });
+
+                const menu = document.getElementById(`reactions-${postId}`);
+                menu.classList.toggle('hidden');
+            });
+        });
+
+        // Reaction options (select reaction)
+        document.querySelectorAll('.reaction-option').forEach(opt => {
+            opt.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const menu = opt.parentElement;
+                const postId = menu.id.replace('reactions-', '');
+                const value = opt.dataset.value;
+                const btn = document.querySelector(`.reaction-btn[data-post-id="${postId}"]`);
+                const currentLabelSpan = btn.querySelector('span:first-child');
+                const currentVal = currentLabelSpan.textContent;
+
+                // Optimistic UI update (optional, but good for responsiveness)
+                // For now relying on real-time update from Firestore
+
+                // Determine if we are setting new or toggling off (if same value clicked)
+                // Actually, since the menu is generic, checking against current UI state is tricky if the button text is "Reagisci".
+                // But if button says "Osservato" and we click "Osservato", we should probably toggle off.
+
+                let newValue = value;
+                if (currentVal === value) {
+                    newValue = null; // Toggle off
+                }
+
+                await Storage.updateReaction(postId, this.currentUser.uid, newValue);
+
+                // Hide menu
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Close menus when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.reaction-menu').forEach(menu => menu.classList.add('hidden'));
+        });
+
         // Bookmark buttons
         document.querySelectorAll('.bookmark-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -315,16 +398,30 @@ class AsocialApp {
             e.preventDefault();
 
             const text = textarea.value.trim();
-            if (!text) return;
+            // Validate: Either text OR image must be present
+            if (!text && !this.capturedImageBlob) return;
 
             // Disable button during send
             postBtn.disabled = true;
             postBtn.textContent = 'invio...';
 
             try {
+                let imageUrl = null;
+
+                // Upload image if present
+                if (this.capturedImageBlob) {
+                    const uploadResult = await uploadImage(this.capturedImageBlob, this.currentUser.uid);
+                    if (uploadResult.success) {
+                        imageUrl = uploadResult.url;
+                    } else {
+                        throw new Error(uploadResult.error || 'Upload failed');
+                    }
+                }
+
                 // Create post
                 const postData = {
                     content: text,
+                    imageUrl: imageUrl,
                     authorId: this.currentUser.uid,
                     authorName: this.currentUser.displayName || this.currentUser.email.split('@')[0] || 'Anonimo'
                 };
@@ -335,17 +432,112 @@ class AsocialApp {
                     // Reset form
                     textarea.value = '';
                     charCounter.textContent = '0/500';
+                    this.resetCamera();
                 } else {
                     alert('Errore nell\'invio del messaggio');
                 }
             } catch (error) {
                 console.error('Error creating post:', error);
-                alert('Errore nell\'invio del messaggio');
+                alert('Errore nell\'invio del messaggio: ' + error.message);
             } finally {
                 postBtn.disabled = false;
                 postBtn.textContent = 'invia';
             }
         });
+    }
+
+    setupCamera() {
+        this.videoEl = document.getElementById('camera-video');
+        this.canvasEl = document.getElementById('camera-canvas');
+        this.previewImg = document.getElementById('params-preview-img');
+        this.startBtn = document.getElementById('start-camera-btn');
+        this.captureBtn = document.getElementById('capture-btn');
+        this.retakeBtn = document.getElementById('retake-btn');
+        this.cameraSection = document.getElementById('camera-preview');
+
+        this.stream = null;
+        this.capturedImageBlob = null;
+
+        this.startBtn.addEventListener('click', () => this.startCamera());
+        this.captureBtn.addEventListener('click', () => this.capturePhoto());
+        this.retakeBtn.addEventListener('click', () => this.retakePhoto());
+    }
+
+    async startCamera() {
+        try {
+            this.stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' },
+                audio: false
+            });
+
+            this.videoEl.srcObject = this.stream;
+            this.cameraSection.classList.remove('hidden');
+            this.videoEl.classList.remove('hidden');
+            this.canvasEl.classList.add('hidden');
+            this.previewImg.classList.add('hidden');
+
+            this.startBtn.classList.add('hidden');
+            this.captureBtn.classList.remove('hidden');
+            this.retakeBtn.classList.add('hidden');
+        } catch (err) {
+            console.error("Camera access denied:", err);
+            alert("Impossibile accedere alla fotocamera. Assicurati di aver concesso i permessi.");
+        }
+    }
+
+    capturePhoto() {
+        if (!this.stream) return;
+
+        // Set canvas dimensions to match video
+        this.canvasEl.width = this.videoEl.videoWidth;
+        this.canvasEl.height = this.videoEl.videoHeight;
+
+        // Draw video frame to canvas
+        const ctx = this.canvasEl.getContext('2d');
+        ctx.drawImage(this.videoEl, 0, 0, this.canvasEl.width, this.canvasEl.height);
+
+        // Convert to blob
+        this.canvasEl.toBlob((blob) => {
+            this.capturedImageBlob = blob;
+
+            // Show preview
+            this.previewImg.src = URL.createObjectURL(blob);
+            this.previewImg.classList.remove('hidden');
+            this.videoEl.classList.add('hidden');
+
+            // Stop stream to save battery
+            this.stopStream();
+
+            // Update buttons
+            this.captureBtn.classList.add('hidden');
+            this.retakeBtn.classList.remove('hidden');
+        }, 'image/jpeg', 0.8);
+    }
+
+    retakePhoto() {
+        this.capturedImageBlob = null;
+        this.previewImg.classList.add('hidden');
+        this.startCamera();
+    }
+
+    resetCamera() {
+        this.stopStream();
+        this.capturedImageBlob = null;
+        this.cameraSection.classList.add('hidden');
+        this.startBtn.classList.remove('hidden');
+        this.captureBtn.classList.add('hidden');
+        this.retakeBtn.classList.add('hidden');
+        if (this.previewImg.src) {
+            URL.revokeObjectURL(this.previewImg.src);
+            this.previewImg.src = '';
+        }
+    }
+
+    stopStream() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
+        }
     }
 
     renderProfile(userId) {

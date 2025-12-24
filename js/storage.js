@@ -12,7 +12,8 @@ import {
     updateDoc,
     arrayUnion,
     getDoc,
-    deleteDoc
+    deleteDoc,
+    deleteField
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const Storage = {
@@ -96,6 +97,25 @@ const Storage = {
     },
 
     // Update a post
+    async updateReaction(postId, userId, reactionType) {
+        try {
+            const postRef = doc(db, 'posts', postId);
+            const updateData = {};
+
+            if (reactionType) {
+                updateData[`reactions.${userId}`] = reactionType;
+            } else {
+                updateData[`reactions.${userId}`] = deleteField();
+            }
+
+            await updateDoc(postRef, updateData);
+            return { success: true };
+        } catch (error) {
+            console.error("Error updating reaction:", error);
+            return { success: false, error: error.message };
+        }
+    },
+
     async updatePost(postId, newContent) {
         try {
             const postRef = doc(db, 'posts', postId);

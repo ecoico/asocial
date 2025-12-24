@@ -1,0 +1,69 @@
+/* Honest Reactions Styling */
+
+.reaction-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.reaction-btn {
+    position: relative;
+    /* Ensure z-index works if needed */
+}
+
+.reaction-menu {
+    position: absolute;
+    bottom: 100%;
+    /* Show above the button */
+    left: 0;
+    background-color: #000;
+    border: 1px solid #333;
+    border-radius: 4px;
+    /* Slight roundness */
+    padding: 0.5rem 0;
+    min-width: 140px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.reaction-menu.hidden {
+    display: none;
+}
+
+.reaction-option {
+    background: none;
+    border: none;
+    color: #888;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.reaction-option:hover {
+    background-color: #111;
+    color: #fff;
+    padding-left: 1.25rem;
+    /* Slight slide effect */
+}
+
+/* Arrow for the menu */
+.reaction-menu::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #000 transparent transparent transparent;
+}
+
+.reaction-count {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-left: 4px;
+}

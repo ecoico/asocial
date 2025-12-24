@@ -7,6 +7,8 @@
     <title>asocial - being ordinary is the value</title>
     <meta name="description" content="A social app for the mundane, ordinary, and unremarkable moments of life.">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/reactions.css">
+    <link rel="stylesheet" href="css/auth.css">
 </head>
 
 <body>
@@ -35,8 +37,29 @@
                 <!-- Create Post Section -->
                 <div class="card create-post">
                     <form id="create-post-form">
-                        <textarea id="post-text" placeholder="Cosa fai di noioso?"
-                            maxlength="500"></textarea>
+                        <textarea id="post-text" placeholder="Cosa fai di noioso?" maxlength="500"></textarea>
+
+                        <!-- Live Camera UI (No File Upload) -->
+                        <div class="camera-section">
+                            <div class="camera-preview hidden" id="camera-preview">
+                                <video id="camera-video" autoplay playsinline muted></video>
+                                <canvas id="camera-canvas" class="hidden"></canvas>
+                                <img id="params-preview-img" class="hidden" alt="Scatto">
+                            </div>
+
+                            <div class="camera-controls">
+                                <button type="button" id="start-camera-btn" class="btn btn-secondary btn-sm">
+                                    📸 avvia fotocamera
+                                </button>
+                                <button type="button" id="capture-btn" class="btn btn-primary btn-sm hidden">
+                                    scatta foto
+                                </button>
+                                <button type="button" id="retake-btn" class="btn btn-ghost btn-sm hidden">
+                                    riprova
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="form-actions">
                             <div class="char-counter" id="char-counter">0/500</div>
                             <button type="submit" class="btn btn-primary" id="post-btn">invia</button>

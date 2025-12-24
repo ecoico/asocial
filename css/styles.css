@@ -685,4 +685,40 @@ html {
 ::selection {
     background: rgba(107, 144, 128, 0.2);
     color: var(--color-text-primary);
+}/* Camera UI */
+.camera-section {
+    margin: var(--space-3) 0;
+}
+
+.camera-preview {
+    width: 100%;
+    margin-bottom: var(--space-2);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: #000;
+    position: relative;
+    max-height: 400px;
+}
+
+#camera-video,
+#params-preview-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.camera-controls {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-sm {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-xs);
+}
+
+.hidden {
+    display: none !important;
 }
