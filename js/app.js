@@ -1,8 +1,6 @@
 // Main Application Logic for Asocial with Firebase
 import { requireAuth, logout, getCurrentUser } from './auth.js';
 import Storage from './storage.js';
-// Image upload module removed
-// import { uploadImage } from './image-upload.js';
 
 class AsocialApp {
     constructor() {
@@ -31,9 +29,6 @@ class AsocialApp {
 
             // Set up create post form
             this.setupCreatePost();
-
-            // Setup file upload
-            this.setupImageUpload();
 
             // Subscribe to real-time posts
             this.subscribeToPostsUpdates();
@@ -160,7 +155,7 @@ class AsocialApp {
         
         <div class="post-content" id="content-${post.id}">
             ${this.escapeHtml(post.content)}
-            ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image" loading="lazy">` : ''}
+            <!-- Image removed from render -->
         </div>
         
         <div class="post-actions">
@@ -381,48 +376,30 @@ class AsocialApp {
     setupCreatePost() {
         const form = document.getElementById('create-post-form');
         const textarea = document.getElementById('post-text');
-        const charCounter = document.getElementById('char-counter');
         const postBtn = document.getElementById('post-btn');
 
-        // Character counter
-        textarea.addEventListener('input', () => {
-            const length = textarea.value.length;
-            charCounter.textContent = `${length}/500`;
-
-            charCounter.classList.remove('warning', 'error');
-            if (length > 450) charCounter.classList.add('warning');
-            if (length >= 500) charCounter.classList.add('error');
-        });
+        if (!form || !textarea || !postBtn) return;
 
         // Form submission
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const text = textarea.value.trim();
-            // Validate: Either text OR image must be present
-            if (!text && !this.selectedFile) return;
+            // LOWERCASE FILTER: Force all text to lowercase
+            const rawText = textarea.value.trim();
+            const text = rawText.toLowerCase();
+
+            // Validate: check text
+            if (!text) return;
 
             // Disable button during send
             postBtn.disabled = true;
             postBtn.textContent = 'invio...';
 
             try {
-                let imageUrl = null;
-
-                // Upload image if present
-                if (this.selectedFile) {
-                    const uploadResult = await uploadImage(this.selectedFile, this.currentUser.uid);
-                    if (uploadResult.success) {
-                        imageUrl = uploadResult.url;
-                    } else {
-                        throw new Error(uploadResult.error || 'Upload failed');
-                    }
-                }
-
                 // Create post
                 const postData = {
                     content: text,
-                    imageUrl: imageUrl,
+                    imageUrl: null,
                     authorId: this.currentUser.uid,
                     authorName: this.currentUser.displayName || this.currentUser.email.split('@')[0] || 'Anonimo'
                 };
@@ -432,8 +409,6 @@ class AsocialApp {
                 if (result.success) {
                     // Reset form
                     textarea.value = '';
-                    charCounter.textContent = '0/500';
-                    this.resetImageUpload();
                 } else {
                     alert('Errore nell\'invio del messaggio');
                 }
@@ -442,50 +417,10 @@ class AsocialApp {
                 alert('Errore nell\'invio del messaggio: ' + error.message);
             } finally {
                 postBtn.disabled = false;
-                postBtn.textContent = 'invia';
+                postBtn.textContent = 'invio';
             }
         });
     }
-
-    setupImageUpload() {
-        this.fileInput = document.getElementById('image-upload');
-        this.previewContainer = document.getElementById('image-preview-container');
-        this.previewImg = document.getElementById('preview-img');
-        this.removeBtn = document.getElementById('remove-image-btn');
-        this.fileNameSpan = document.getElementById('file-name');
-
-        this.selectedFile = null;
-
-        if (!this.fileInput) return;
-
-        this.fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File troppo grande (max 5MB)');
-                this.fileInput.value = '';
-                return;
-            }
-
-            this.selectedFile = file;
-            this.fileNameSpan.textContent = file.name;
-
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.previewImg.src = e.target.result;
-                this.previewContainer.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        });
-
-        this.removeBtn.addEventListener('click', () => {
-            this.resetImageUpload();
-        });
-    }
-
-
 
     renderProfile(userId) {
         const profileHeader = document.getElementById('profile-header');
