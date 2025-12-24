@@ -36,30 +36,11 @@
 
                 <!-- Create Post Section -->
                 <div class="card create-post">
-                    <form id="create-post-form" class="create-post-form-container">
-                        <textarea id="post-text" placeholder="Che c'è di nuovo?" maxlength="500"></textarea>
+                    <form id="create-post-form">
+                        <textarea id="post-text" placeholder="Cosa fai di noioso?" maxlength="500"></textarea>
 
-                        <!-- Image Preview Area -->
-                        <div id="image-preview-area" class="image-preview-area">
-                            <div class="preview-wrapper">
-                                <img id="preview-img" src="" alt="">
-                                <button type="button" id="remove-image-btn" class="btn-remove-preview">×</button>
-                            </div>
-                        </div>
-
-                        <!-- Footer Actions -->
-                        <div class="create-post-footer">
-                            <div class="create-post-tools">
-                                <button type="button" class="btn-photo"
-                                    onclick="document.getElementById('image-upload').click()">
-                                    📷 Foto
-                                </button>
-                                <span id="file-name" class="file-name"
-                                    style="font-size: 0.8rem; color: #888; max-width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"></span>
-                                <input type="file" id="image-upload" accept="image/*" class="hidden">
-                            </div>
-
-                            <button type="submit" class="btn btn-submit" id="post-btn">Pubblica</button>
+                        <div class="form-actions" style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                            <button type="submit" class="btn btn-primary" id="post-btn">invio</button>
                         </div>
                     </form>
                 </div>

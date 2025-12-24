@@ -1,7 +1,8 @@
 // Main Application Logic for Asocial with Firebase
 import { requireAuth, logout, getCurrentUser } from './auth.js';
 import Storage from './storage.js';
-import { uploadImage } from './image-upload.js';
+// Image upload module removed
+// import { uploadImage } from './image-upload.js';
 
 class AsocialApp {
     constructor() {
