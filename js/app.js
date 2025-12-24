@@ -31,8 +31,8 @@ class AsocialApp {
             // Set up create post form
             this.setupCreatePost();
 
-            // Set up camera
-            this.setupCamera();
+            // Setup file upload
+            this.setupImageUpload();
 
             // Subscribe to real-time posts
             this.subscribeToPostsUpdates();
@@ -399,7 +399,7 @@ class AsocialApp {
 
             const text = textarea.value.trim();
             // Validate: Either text OR image must be present
-            if (!text && !this.capturedImageBlob) return;
+            if (!text && !this.selectedFile) return;
 
             // Disable button during send
             postBtn.disabled = true;
@@ -409,8 +409,8 @@ class AsocialApp {
                 let imageUrl = null;
 
                 // Upload image if present
-                if (this.capturedImageBlob) {
-                    const uploadResult = await uploadImage(this.capturedImageBlob, this.currentUser.uid);
+                if (this.selectedFile) {
+                    const uploadResult = await uploadImage(this.selectedFile, this.currentUser.uid);
                     if (uploadResult.success) {
                         imageUrl = uploadResult.url;
                     } else {
@@ -432,7 +432,7 @@ class AsocialApp {
                     // Reset form
                     textarea.value = '';
                     charCounter.textContent = '0/500';
-                    this.resetCamera();
+                    this.resetImageUpload();
                 } else {
                     alert('Errore nell\'invio del messaggio');
                 }
@@ -446,98 +446,50 @@ class AsocialApp {
         });
     }
 
-    setupCamera() {
-        this.videoEl = document.getElementById('camera-video');
-        this.canvasEl = document.getElementById('camera-canvas');
-        this.previewImg = document.getElementById('params-preview-img');
-        this.startBtn = document.getElementById('start-camera-btn');
-        this.captureBtn = document.getElementById('capture-btn');
-        this.retakeBtn = document.getElementById('retake-btn');
-        this.cameraSection = document.getElementById('camera-preview');
+    setupImageUpload() {
+        this.fileInput = document.getElementById('image-upload');
+        this.previewContainer = document.getElementById('image-preview-container');
+        this.previewImg = document.getElementById('preview-img');
+        this.removeBtn = document.getElementById('remove-image-btn');
+        this.fileNameSpan = document.getElementById('file-name');
 
-        this.stream = null;
-        this.capturedImageBlob = null;
+        this.selectedFile = null;
 
-        this.startBtn.addEventListener('click', () => this.startCamera());
-        this.captureBtn.addEventListener('click', () => this.capturePhoto());
-        this.retakeBtn.addEventListener('click', () => this.retakePhoto());
-    }
+        if (!this.fileInput) return;
 
-    async startCamera() {
-        try {
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' },
-                audio: false
-            });
+        this.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            this.videoEl.srcObject = this.stream;
-            this.cameraSection.classList.remove('hidden');
-            this.videoEl.classList.remove('hidden');
-            this.canvasEl.classList.add('hidden');
-            this.previewImg.classList.add('hidden');
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File troppo grande (max 5MB)');
+                this.fileInput.value = '';
+                return;
+            }
 
-            this.startBtn.classList.add('hidden');
-            this.captureBtn.classList.remove('hidden');
-            this.retakeBtn.classList.add('hidden');
-        } catch (err) {
-            console.error("Camera access denied:", err);
-            alert("Impossibile accedere alla fotocamera. Assicurati di aver concesso i permessi.");
-        }
-    }
-
-    capturePhoto() {
-        if (!this.stream) return;
-
-        // Set canvas dimensions to match video
-        this.canvasEl.width = this.videoEl.videoWidth;
-        this.canvasEl.height = this.videoEl.videoHeight;
-
-        // Draw video frame to canvas
-        const ctx = this.canvasEl.getContext('2d');
-        ctx.drawImage(this.videoEl, 0, 0, this.canvasEl.width, this.canvasEl.height);
-
-        // Convert to blob
-        this.canvasEl.toBlob((blob) => {
-            this.capturedImageBlob = blob;
+            this.selectedFile = file;
+            this.fileNameSpan.textContent = file.name;
 
             // Show preview
-            this.previewImg.src = URL.createObjectURL(blob);
-            this.previewImg.classList.remove('hidden');
-            this.videoEl.classList.add('hidden');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.previewImg.src = e.target.result;
+                this.previewContainer.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
 
-            // Stop stream to save battery
-            this.stopStream();
-
-            // Update buttons
-            this.captureBtn.classList.add('hidden');
-            this.retakeBtn.classList.remove('hidden');
-        }, 'image/jpeg', 0.8);
+        this.removeBtn.addEventListener('click', () => {
+            this.resetImageUpload();
+        });
     }
 
-    retakePhoto() {
-        this.capturedImageBlob = null;
-        this.previewImg.classList.add('hidden');
-        this.startCamera();
-    }
-
-    resetCamera() {
-        this.stopStream();
-        this.capturedImageBlob = null;
-        this.cameraSection.classList.add('hidden');
-        this.startBtn.classList.remove('hidden');
-        this.captureBtn.classList.add('hidden');
-        this.retakeBtn.classList.add('hidden');
-        if (this.previewImg.src) {
-            URL.revokeObjectURL(this.previewImg.src);
-            this.previewImg.src = '';
-        }
-    }
-
-    stopStream() {
-        if (this.stream) {
-            this.stream.getTracks().forEach(track => track.stop());
-            this.stream = null;
-        }
+    resetImageUpload() {
+        this.selectedFile = null;
+        if (this.fileInput) this.fileInput.value = '';
+        if (this.fileNameSpan) this.fileNameSpan.textContent = '';
+        if (this.previewContainer) this.previewContainer.classList.add('hidden');
+        if (this.previewImg) this.previewImg.src = '';
     }
 
     renderProfile(userId) {

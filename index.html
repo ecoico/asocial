@@ -40,23 +40,22 @@
                         <textarea id="post-text" placeholder="Cosa fai di noioso?" maxlength="500"></textarea>
 
                         <!-- Live Camera UI (No File Upload) -->
-                        <div class="camera-section">
-                            <div class="camera-preview hidden" id="camera-preview">
-                                <video id="camera-video" autoplay playsinline muted></video>
-                                <canvas id="camera-canvas" class="hidden"></canvas>
-                                <img id="params-preview-img" class="hidden" alt="Scatto">
+                        <!-- Image Upload (Universal: Camera/Gallery) -->
+                        <div class="image-upload-section">
+                            <input type="file" id="image-upload" accept="image/*" class="hidden">
+
+                            <div class="upload-controls">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    onclick="document.getElementById('image-upload').click()">
+                                    📷 aggiungi foto
+                                </button>
+                                <span id="file-name" class="file-name"></span>
                             </div>
 
-                            <div class="camera-controls">
-                                <button type="button" id="start-camera-btn" class="btn btn-secondary btn-sm">
-                                    📸 avvia fotocamera
-                                </button>
-                                <button type="button" id="capture-btn" class="btn btn-primary btn-sm hidden">
-                                    scatta foto
-                                </button>
-                                <button type="button" id="retake-btn" class="btn btn-ghost btn-sm hidden">
-                                    riprova
-                                </button>
+                            <div id="image-preview-container" class="image-preview hidden">
+                                <img id="preview-img" src="" alt="Anteprima">
+                                <button type="button" id="remove-image-btn" class="remove-image"
+                                    title="Rimuovi">×</button>
                             </div>
                         </div>
 
