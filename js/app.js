@@ -58,10 +58,24 @@ class AsocialApp {
         }
     }
 
+    getEffectiveDisplayName() {
+        if (!this.currentUser) return 'Anonimo';
+
+        // 1. Check Firebase Auth profile
+        if (this.currentUser.displayName) return this.currentUser.displayName;
+
+        // 2. Check local backup (set during registration)
+        const tempName = localStorage.getItem('temp_display_name');
+        if (tempName) return tempName;
+
+        // 3. Fallback to email username or Anonimo
+        return this.currentUser.email ? this.currentUser.email.split('@')[0] : 'Anonimo';
+    }
+
     setupUserInfo() {
         const userNameEl = document.getElementById('user-name');
         if (userNameEl && this.currentUser) {
-            userNameEl.textContent = this.currentUser.displayName || this.currentUser.email;
+            userNameEl.textContent = this.getEffectiveDisplayName();
         }
     }
 
@@ -426,13 +440,14 @@ class AsocialApp {
                     content: text,
                     imageUrl: null,
                     authorId: this.currentUser.uid,
-                    authorName: this.currentUser.displayName || this.currentUser.email.split('@')[0] || 'Anonimo'
+                    authorName: this.getEffectiveDisplayName()
                 };
 
                 // CRITICAL: Ensure we use the most up-to-date name if it was just changed/set
                 if (!this.currentUser.displayName && this.currentUser.reload) {
                     await this.currentUser.reload();
-                    postData.authorName = this.currentUser.displayName || postData.authorName;
+                    // Re-evaluate name after reload
+                    postData.authorName = this.getEffectiveDisplayName();
                 }
 
                 const result = await Storage.createPost(postData);
@@ -462,7 +477,7 @@ class AsocialApp {
         // Render header
         const isCurrentUser = userId === this.currentUser.uid;
         const displayName = isCurrentUser
-            ? (this.currentUser.displayName || 'Tu')
+            ? this.getEffectiveDisplayName()
             : 'Utente';
 
         profileHeader.innerHTML = `
