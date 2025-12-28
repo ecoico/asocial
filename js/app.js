@@ -13,6 +13,27 @@ class AsocialApp {
         this.init();
     }
 
+    getUserColor(name) {
+        if (!name) return '#FFFFFF';
+        // Palette: Orange, Pink, Blue, Red, Green, Purple, Cyan, Yellow
+        const colors = [
+            '#FF9F43', // Orange
+            '#FF9FF3', // Pink
+            '#54A0FF', // Blue
+            '#FF6B6B', // Red
+            '#1DD1A1', // Green
+            '#5F27CD', // Purple
+            '#48DBFB', // Cyan
+            '#FECA57'  // Yellow
+        ];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % colors.length;
+        return colors[index];
+    }
+
     async init() {
         // Require authentication
         try {
@@ -185,7 +206,7 @@ class AsocialApp {
         <div class="post-header">
           <!-- Avatar removed for cleaner look -->
           <div class="post-info">
-            <span class="post-username">${this.escapeHtml(post.authorName || 'Anonimo')}</span>
+            <span class="post-username" style="color: ${this.getUserColor(post.authorName)}">${this.escapeHtml(post.authorName || 'Anonimo')}</span>
             <div class="post-timestamp">${this.formatTimestamp(post.timestamp)}${post.edited ? ' (mod)' : ''}</div>
           </div>
           ${isOwnPost ? `
@@ -228,7 +249,7 @@ class AsocialApp {
         return post.comments.map(comment => {
             return `
         <div class="commenta">
-          <div class="comment-author">${this.escapeHtml(comment.authorName || 'Anonimo')}</div>
+          <div class="comment-author" style="color: ${this.getUserColor(comment.authorName)}">${this.escapeHtml(comment.authorName || 'Anonimo')}</div>
           <div class="comment-text">${this.escapeHtml(comment.text)}</div>
           <div class="comment-timestamp">${this.formatTimestamp(comment.timestamp)}</div>
         </div>
@@ -482,7 +503,7 @@ class AsocialApp {
 
         profileHeader.innerHTML = `
       <!-- Avatar removed -->
-      <h2 class="profile-username">${this.escapeHtml(displayName)}</h2>
+      <h2 class="profile-username" style="color: ${this.getUserColor(displayName)}">${this.escapeHtml(displayName)}</h2>
     `;
 
         // Render user's posts

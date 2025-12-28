@@ -4,12 +4,12 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: #FAFAFA;
+    background: #000000;
 }
 
 .auth-card {
-    background: white;
-    border: 1px solid #E0E0E0;
+    background: #111111;
+    border: 1px solid #333333;
     border-radius: 12px;
     padding: 40px;
     max-width: 400px;
@@ -23,12 +23,12 @@
     letter-spacing: -2px;
     text-align: center;
     margin: 0 0 8px 0;
-    color: #000000;
+    color: #FFFFFF;
 }
 
 .auth-tagline {
     text-align: center;
-    color: #666;
+    color: #AAAAAA;
     font-size: 0.9rem;
     margin: 0 0 32px 0;
 }
@@ -47,7 +47,7 @@
     font-size: 1.5rem;
     font-weight: 500;
     margin: 0 0 16px 0;
-    color: #333;
+    color: #FFFFFF;
     text-align: center;
 }
 
@@ -58,8 +58,10 @@
 
 .form-group input {
     padding: 14px 16px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #333333;
     border-radius: 8px;
+    background: #000000;
+    color: #FFFFFF;
     font-size: 1rem;
     transition: all 0.3s ease;
     font-family: inherit;
@@ -67,15 +69,15 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #000000;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .auth-btn {
     padding: 14px;
-    background: #000000;
-    color: white;
-    border: 1px solid #000000;
+    background: #FFFFFF;
+    color: #000000;
+    border: 1px solid #FFFFFF;
     border-radius: 6px;
     font-size: 1rem;
     font-weight: 500;
@@ -86,9 +88,9 @@
 
 .auth-btn:hover {
     transform: translateY(-1px);
-    background: white;
-    color: black;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #000000;
+    color: #FFFFFF;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
 }
 
 .auth-btn:active {
@@ -97,20 +99,20 @@
 
 .auth-toggle {
     text-align: center;
-    color: #666;
+    color: #999;
     font-size: 0.9rem;
     margin: 8px 0 0 0;
 }
 
 .auth-toggle a {
-    color: #000000;
+    color: #FFFFFF;
     text-decoration: underline;
     font-weight: 500;
     transition: color 0.2s;
 }
 
 .auth-toggle a:hover {
-    color: #555;
+    color: #CCCCCC;
     text-decoration: none;
 }
 
